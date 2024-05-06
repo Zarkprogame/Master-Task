@@ -16,6 +16,7 @@ class LoginForm(FormLoginDesigner):
         self.auth_controller = AuthUserController()
         self.engine = db.create_engine('sqlite:///database/login.sqlite', echo=False, future=True)
         self.session = Session(bind=self.engine)
+        self.tries = 3
         super().__init__()
 
     def check(self):
@@ -35,11 +36,19 @@ class LoginForm(FormLoginDesigner):
 
     def isPassword(self, password: str, user: Auth_User):
         b_password = end_dec.decrypt(user.password)
-        if (password == b_password):
-            if user.state:
+        if user.state:
+            if (password == b_password):
                 self.root.destroy()
                 FormMasterDesigner(user.id, user.username, LoginForm)
             else:
-                messagebox.showerror(message='This User is  Disabled', title='Message')
+                self.tries -= 1
+                messagebox.showerror(message=f'The Password is Incorrect, you have {self.tries} attemps', title='Message')
+                if self.tries == 0:
+                    #desabilitar usuario
+                    user = self.session.query(Auth_User).get(user.id)
+                    user.state = not user.state
+                    self.session.add(user)
+                    self.session.commit()
+                    messagebox.showerror(message='This User is  Disabled for many attemps, contact an admin', title='Message')
         else:
-            messagebox.showerror(message='The Password is Incorrect', title='Message')
+            messagebox.showerror(message='This User is Disabled, contact an admin', title='Message')
