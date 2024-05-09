@@ -20,6 +20,9 @@ class FormSignup(FormSignupDesigner):
                     user = Auth_User()
                     user.username = self.user.get()
                     user.state = True
+                    with open('./img/logo.png', 'rb') as f:
+                        image = f.read()
+                    user.profile = image
                     user_db: Auth_User = self.auth_controller.getUserByUsername(self.user.get())
                     if not (self.isUserRegister(user_db)):
                         user.password = end_dec.encrypted(self.password.get())

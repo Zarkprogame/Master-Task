@@ -41,14 +41,17 @@ class LoginForm(FormLoginDesigner):
                 self.root.destroy()
                 FormMasterDesigner(user.id, user.username, LoginForm)
             else:
-                self.tries -= 1
-                messagebox.showerror(message=f'The Password is Incorrect, you have {self.tries} attemps', title='Message')
-                if self.tries == 0:
-                    #desabilitar usuario
-                    user = self.session.query(Auth_User).get(user.id)
-                    user.state = not user.state
-                    self.session.add(user)
-                    self.session.commit()
-                    messagebox.showerror(message='This User is  Disabled for many attemps, contact an admin', title='Message')
+                if user.username == 'root':
+                    messagebox.showerror(message=f'The Password is Incorrect', title='Message')
+                else:
+                    self.tries -= 1
+                    messagebox.showerror(message=f'The Password is Incorrect, you have {self.tries} attemps', title='Message')
+                    if self.tries == 0:
+                        #desabilitar usuario
+                        user = self.session.query(Auth_User).get(user.id)
+                        user.state = not user.state
+                        self.session.add(user)
+                        self.session.commit()
+                        messagebox.showerror(message='This User is  Disabled for many attemps, contact an admin', title='Message')
         else:
             messagebox.showerror(message='This User is Disabled, contact an admin', title='Message')

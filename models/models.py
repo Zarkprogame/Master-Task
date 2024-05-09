@@ -1,5 +1,5 @@
 from sqlalchemy import Column
-from sqlalchemy import String, Integer, Boolean, ForeignKey
+from sqlalchemy import String, Integer, Boolean, ForeignKey, LargeBinary
 from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
@@ -9,6 +9,7 @@ class Auth_User(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(12))
     password = Column(String(12))
+    profile = Column(LargeBinary)
     state = Column(Boolean, nullable=False)
     todo = relationship('Todo', cascade='all, delete, delete-orphan')
 
