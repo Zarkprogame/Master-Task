@@ -11,6 +11,7 @@ from views.master.form_construction import FormConstruction
 from views.master.todo.form_todo import FormTodo
 from views.master.admin.form_admin import FormAdmin
 from views.master.settings.settings import Settings
+from views.master.about.about import About
 from controllers.auth_user_controller import Auth_User
 
 class FormMasterDesigner(Tk):
@@ -33,7 +34,7 @@ class FormMasterDesigner(Tk):
         self.title("Panel")
         self.iconbitmap("./img/logo.ico")
         w, h = 1024 , 600
-        self.minsize(800, 590)
+        self.minsize(1100, 590)
         utl.root_center(self, w, h)
 
     def panels(self):
@@ -75,19 +76,19 @@ class FormMasterDesigner(Tk):
 
         self.btnAdmin = Button(self.side_menu)
         self.btnTodo = Button(self.side_menu)
-        self.btnSchedule = Button(self.side_menu)
         self.btnNotes = Button(self.side_menu)
         self.btnMemofiches = Button(self.side_menu)
         self.btnSettings = Button(self.side_menu)
+        self.About = Button(self.side_menu)
         self.btnSignoff = Button(self.side_menu)
 
         btn_info = [
             ('Admin', "\uf109", self.btnAdmin, self.open_form_admin),
             ('Todo', "\uf109", self.btnTodo, self.open_form_Todo),
-            ('Schedule', "\uf109", self.btnSchedule, self.open_form_construction),
             ('Notes', "\uf109", self.btnNotes, self.open_form_construction),
             ('Memofiches', "\uf109", self.btnMemofiches, self.open_form_construction),
             ('Settings', "\uf109", self.btnSettings, self.open_form_settings),
+            ('About', "\uf109", self.About, self.open_form_about),
             ('Signoff', "\uf109", self.btnSignoff, self.signOff)
         ]
 
@@ -149,3 +150,7 @@ class FormMasterDesigner(Tk):
     def open_form_settings(self):
         self.clean_panel(self.main_body)
         Settings(self.main_body, self.id)
+
+    def open_form_about(self):
+        self.clean_panel(self.main_body)
+        About(self.main_body, self.id)

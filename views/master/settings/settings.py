@@ -1,7 +1,9 @@
 from tkinter import *
+from tkinter import messagebox
 from views.master.settings.settings_designer import SettingsDesigner
 from views.master.settings.photo.form_photo_designer import FormPhotoDesigner
 from views.master.settings.profile.form_profile_designer import FormProfileDesigner
+from views.master.settings.restore.form_restore import RestoreManager
 
 class Settings(SettingsDesigner):
     def __init__(self, main_body, id):
@@ -58,10 +60,16 @@ class Settings(SettingsDesigner):
         pass
 
     def open_form_restore(self):
-        pass
+        answer = messagebox.askyesno("Confirm action", "Are you sure you delete all the user's To Do?")
+        if answer:
+            restore_manager = RestoreManager()
+            result_message = restore_manager.delete_all_todos(self.id)
+            messagebox.showinfo("Result", result_message)
+
 
     def open_form_backup(self):
-        pass
+        self.clean_panel(self.main_body)
+        (self.main_body, Settings, self.id)
 
     def clean_panel(self, panel):
         for widget in panel.winfo_children():

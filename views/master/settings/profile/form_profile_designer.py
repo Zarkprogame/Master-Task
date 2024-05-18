@@ -33,8 +33,8 @@ class FormProfileDesigner():
         self.user.pack(fill=X, padx=20, pady=5)
         self.user.focus()
 
-        self.btnSend = Button(self.frameusername, text='Send', font=('Roborto', 11), bg='#03D92D', bd=0, command=self.changeUsername)
-        self.btnSend.pack(side='top', padx=20, pady=(5,10), fill='both')
+        self.btnSendU = Button(self.frameusername, text='Send', font=('Roborto', 11), bg='#03D92D', bd=0, command=self.changeUsername)
+        self.btnSendU.pack(side='top', padx=20, pady=(5,10), fill='both')
 
         self.framepassword = LabelFrame(main_body, text='Change Password', font=('Roborto', 15), bg='#f1faff')
         self.framepassword.pack(side='top', expand=NO, fill='both', padx=10, pady=5)
@@ -60,8 +60,8 @@ class FormProfileDesigner():
         self.ConfirmPassword.pack(fill=X, padx=20, pady=5)
         self.ConfirmPassword.config(show='*')
 
-        self.btnSend = Button(self.framepassword, text='Send', font=('Roborto', 12), bg='#03D92D', bd=0, command=self.changePassword)
-        self.btnSend.pack(side='top', padx=20, pady=(5,10), fill='both')
+        self.btnSendP = Button(self.framepassword, text='Send', font=('Roborto', 12), bg='#03D92D', bd=0, command=self.changePassword)
+        self.btnSendP.pack(side='top', padx=20, pady=(5,10), fill='both')
 
     def back_button(self):
         self.clean_panel(self.main_body)
@@ -74,14 +74,19 @@ class FormProfileDesigner():
     def changeUsername(self):
         user = self.session.query(Auth_User).get(self.id)
         username = self.session.query(Auth_User).filter_by(username=self.user.get()).first()
-        if not (self.isUserRegister(username)):
-            user.username = self.user.get()
-            self.session.add(user)
-            self.session.commit()
-            messagebox.showinfo("Info", "The name was Successfully Changed!!")
-            self.clean_panel(self.main_body)
-            FormProfileDesigner(self.main_body, self.settings, self.id)
-            messagebox.showinfo("Info", "The Side's Top Name will apear in the next Log In!!")
+        if user.username == "root":
+            messagebox.showinfo("Info", "The Admin's Username cant be changed")
+            self.user.delete(0, END)
+            self.btnSendU.config(state='disabled')
+        else:
+            if not (self.isUserRegister(username)):
+                user.username = self.user.get()
+                self.session.add(user)
+                self.session.commit()
+                messagebox.showinfo("Info", "The name was Successfully Changed!!")
+                self.clean_panel(self.main_body)
+                FormProfileDesigner(self.main_body, self.settings, self.id)
+                messagebox.showinfo("Info", "The Side's Top Name will apear in the next Log In!!")
 
     def isUserRegister(self, user: Auth_User):
         status: bool = False
@@ -94,12 +99,21 @@ class FormProfileDesigner():
         user = self.session.query(Auth_User).get(self.id)
         b_password = end_dec.decrypt(user.password)
         if b_password == self.password.get():
-            pass
+            if self.isConfirmationPassword():
+                if self.verification(self.newPassword.get()):
+                    user.password = end_dec.encrypted(self.newPassword.get())
+                    self.session.add(user)
+                    self.session.commit()
+                    messagebox.showinfo("Info", "Your Password have been Successfully Changed!!")
+                    self.password.delete(0, END)
+                    self.newPassword.delete(0, END)
+                    self.ConfirmPassword.delete(0, END)
+                else:
+                    self.newPassword.delete(0, END)
+                    self.ConfirmPassword.delete(0, END)
         else:
             messagebox.showerror("Info", "Your Password is Wrong")
-
-
-
+            self.password.delete(0, END)
 
     def isConfirmationPassword(self):
         status: bool = True
@@ -109,3 +123,32 @@ class FormProfileDesigner():
             self.newPassword.delete(0, END)
             self.ConfirmPassword.delete(0, END)
         return status
+    
+    def verification(self, password):
+        if len(password) < 8:
+            messagebox.showerror("Info", "The Password is too Short")
+            return False
+        elif len(password) > 20:
+            messagebox.showerror("Info", "The Password is too Long")
+            return False
+
+        special_chars = "!@#$%^&*()_+=-[]{};:'\",.<>/?"
+        esp_char = any(char in special_chars for char in password)
+        if not esp_char:
+            messagebox.showerror("Info", "The password need at least one Special Character")
+            return False
+        
+        num = any(char.isdigit() for char in password)
+        if not num:
+            messagebox.showerror("Info", "The password need at least one Number")
+            return False
+
+        tiene_mayuscula = any(char.isupper() for char in password)
+        if not tiene_mayuscula:
+            messagebox.showerror("Info", "The password need at least one Capital Letter")
+            return False
+        return True
+    
+    def clearText(self):
+        pass
+        
